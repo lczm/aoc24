@@ -1,4 +1,4 @@
-  (ns aoc24.1
+(ns aoc24.1
   (:require
    [clojure.string :as str]))
 
