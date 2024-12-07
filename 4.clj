@@ -15,6 +15,14 @@
               ys (range y (+ y (* size dy)) dy)]]
     (map #(get-in grid [%2 %1] nil) xs ys)))
 
+(defn get-diagonals-x [grid [x y]]
+  [[(get-in grid [(- y 1) (- x 1)] nil)
+    (get-in grid [y x] nil)
+    (get-in grid [(+ y 1) (+ x 1)] nil)]
+   [(get-in grid [(- y 1) (+ x 1)] nil)
+    (get-in grid [y x] nil)
+    (get-in grid [(+ y 1) (- x 1)] nil)]])
+
 (defn count-xmas [grid]
   (let [height (count grid)
         width (count (first grid))]
@@ -30,16 +38,18 @@
 
 
 (defn count-mas [x]
-  (= 2 (count (filter #(or (= "MAS" %) (= "SAM" %)) x))))
+  (= 2 (count (filter #(or (= "MAS" %)
+                           (= "SAM" %)) x))))
 
 (defn count-x-mas [grid]
   (let [height (count grid)
         width (count (first grid))]
     (->> (for [y (range height)
                x (range width)
-               :let [diagonals (map #(apply str %) (get-diagonals grid [x y] 3))
+               :let [diagonals (map #(apply str %) (get-diagonals-x grid [x y]))
                      processed-diagonals (count-mas diagonals)]]
-           (println diagonals)))))
+           (if processed-diagonals 1 0))
+         (reduce +))))
 
 (defn part1 [filename]
   (let [files (read-file filename)]
@@ -52,4 +62,4 @@
 (part1 "4.sample")
 (part1 "4.input")
 (part2 "4.sample")
-;; (part2 "4.input")
+(part2 "4.input")
