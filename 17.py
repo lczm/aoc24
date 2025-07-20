@@ -6,7 +6,7 @@ f = "17.input"
 with open(f, 'r') as file:
     lines = [line.strip() for line in file if line.strip()]
 
-def parse(registers) -> int:
+def parse(registers) -> list[int]:
     return [
         int(register.split(":")[1].strip())
         for register in registers
@@ -89,6 +89,7 @@ def compute(state):
         if opcode == 5: op5(state, decoded_operand)
         if opcode == 6: op6(state, decoded_operand)
         if opcode == 7: op7(state, decoded_operand)
+        print(f"{state.IP:<3d}, {opcode}, {operand}, {state}")
         if state.IP > L - 1:
             break
 
@@ -98,4 +99,29 @@ def p1(x=0):
     compute(state)
     print(','.join(map(str, state.OUT)))
 
-p1()
+def step(A):
+    r = A & 7
+    s = r ^ 3
+    C = A >> s
+    return (r ^ C) & 7
+
+def p2():
+    best = None
+    def dfs(pos, nextA):
+        nonlocal best
+        if pos < 0:
+            if best is None or nextA < best:
+                best = nextA
+            return
+        required = P[pos]
+        high = nextA
+        for d in range(8):
+            A_pos = (high << 3) | d
+            if A_pos == 0:
+                continue
+            if step(A_pos) == required:
+                dfs(pos - 1, A_pos)
+    dfs(len(P) - 1, 0)
+    print(best)
+
+p2()
